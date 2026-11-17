@@ -363,7 +363,7 @@ dialog img{width:100%;height:auto;display:block;border-radius:4px}
       var tot=run,bi=0,wi=0,np=0,nn=0;
       vals.forEach(function(v,i){if(v>vals[bi])bi=i;if(v<vals[wi])wi=i;if(v>0)np++;if(v<0)nn++});
       function stat(l,v,c){return '<div class="stat"><span>'+l+'</span><b class="'+(c||'')+'">'+v+'</b></div>'}
-      st.innerHTML=stat('Total do mês',sg(tot)+' '+un,tot<0?'neg':'pos')+stat('Melhor dia',sg(vals[bi])+' '+un+' ('+dm(days[bi])+')','pos')+stat('Pior dia',sg(vals[wi])+' '+un+' ('+dm(days[wi])+')','neg')+stat('Dias +  /  −',np+'  /  '+nn)+stat('Operações',String(cnt));
+      st.innerHTML=stat('Total do mês',sg(tot)+' '+un,tot<0?'neg':'pos')+stat('Dias +  /  −',np+'  /  '+nn)+stat('Operações',String(cnt));
       var W=slots.length<=7?420:760,H=320,L=52,R=16,T=26,B=34,pw=W-L-R,ph=H-T-B;
       var all2=[0].concat(vals,cum),rmx=Math.max.apply(null,all2),rmn=Math.min.apply(null,all2);
       var mx=rmx,mn=rmn;if(mx===mn)mx=mn+1;var pad=(mx-mn)*.14;mx+=pad;mn-=pad;
