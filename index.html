@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Diário de Operações · XAUUSD</title>
+<style>
+:root{--bg:#f2f1ec;--surface:#fbfaf7;--ink:#1c2230;--muted:#6b7080;--line:#d8d6cc;--gold:#a87a1c;--goldbg:#f1e6c9;--danger:#a63a2e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#14171f;--surface:#1c202b;--ink:#eceae2;--muted:#9096a6;--line:#303544;--gold:#d9aa4a;--goldbg:#3a2f16;--danger:#e0786b}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#14171f;--surface:#1c202b;--ink:#eceae2;--muted:#9096a6;--line:#303544;--gold:#d9aa4a;--goldbg:#3a2f16;--danger:#e0786b}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Hanken Grotesk","Segoe UI",system-ui,sans-serif}
+main{max-width:1000px;margin:0 auto;padding:28px 18px 60px}
+h1{font:600 28px/1.2 "Fraunces",Georgia,serif;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 24px}
+form{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:18px;display:grid;gap:14px;grid-template-columns:1fr 1fr;align-items:start}
+label{display:grid;gap:6px;font-size:14px;color:var(--muted)}
+input[type=text],input[type=date],input[type=number]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:10px 12px;width:100%}
+input:focus-visible,button:focus-visible,.drop:focus-within{outline:2px solid var(--gold);outline-offset:2px}
+.drop{grid-column:1/-1;border:1.5px dashed var(--line);border-radius:4px;min-height:120px;display:grid;place-items:center;text-align:center;padding:14px;cursor:pointer;color:var(--muted);position:relative}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop img{width:min(100%,260px);aspect-ratio:1;border-radius:3px;display:block}
+.actions{grid-column:1/-1;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+button{font:inherit;cursor:pointer;border-radius:4px;padding:10px 18px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);font-weight:600}
+button.ghost{background:transparent;color:var(--ink);border-color:var(--line);font-weight:500}
+button:disabled{opacity:.5;cursor:default}
+#msg{font-size:14px;color:var(--muted)} #msg.err{color:var(--danger)}
+.head{display:flex;justify-content:space-between;align-items:baseline;margin:34px 0 14px}
+.head h2{font:600 20px "Fraunces",Georgia,serif;margin:0}
+.count{color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.card img{width:100%;aspect-ratio:1;display:block;cursor:zoom-in;background:var(--line)}
+.meta{padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.meta b{display:block;font-size:15px;color:var(--gold)}
+.meta span{font-size:13px;color:var(--muted)}
+.res{font-weight:600;font-size:14px}.pos{color:#2f7d4f}.neg{color:var(--danger)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pos{color:#5fc08a}}
+:root[data-theme="dark"] .pos{color:#5fc08a}
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.tab{background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;border-radius:0;padding:8px 14px;font-weight:600}
+.tab[aria-selected=true]{color:var(--ink);border-bottom-color:var(--gold)}
+section[hidden]{display:none}
+select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:8px 10px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:14px 0}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.stat span{font-size:13px;color:var(--muted);display:block}.stat b{font-size:18px}
+.chartbox{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px;overflow-x:auto}
+.gl{stroke:var(--line)}.zl{stroke:var(--muted);stroke-dasharray:4 4}
+.ln{stroke:var(--gold);fill:none;stroke-width:2.5;stroke-linejoin:round}
+.tx{fill:var(--muted);font-size:11px}
+.dp{fill:#2f7d4f}.dn{fill:var(--danger)}.bp,.bn{opacity:.35}.bp{fill:#2f7d4f}.bn{fill:var(--danger)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dp,:root:not([data-theme="light"]) .bp{fill:#5fc08a}}
+:root[data-theme="dark"] .dp,:root[data-theme="dark"] .bp{fill:#5fc08a}
+textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:10px 12px;width:100%;resize:vertical;min-height:84px}
+textarea:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.meta>div{min-width:0;flex:1}
+.desc{font-size:13px;margin-top:4px;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.desc:empty{display:none}
+dialog p{margin:0;padding:10px 12px;background:var(--surface);color:var(--ink);font-size:15px;white-space:pre-wrap;border-radius:0 0 4px 4px}
+.del{padding:4px 10px;font-size:13px;background:transparent;color:var(--danger);border-color:var(--line);font-weight:500}
+.empty{color:var(--muted);border:1px dashed var(--line);border-radius:6px;padding:30px;text-align:center}
+dialog{border:0;padding:0;background:transparent;max-width:min(94vw,900px)}
+dialog::backdrop{background:rgba(0,0,0,.75)}
+dialog img{width:100%;height:auto;display:block;border-radius:4px}
+@media (max-width:560px){form{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Diário de operações</h1>
+  <p class="sub">Registre cada trade com data, ativo e o print do gráfico.</p>
+  <div class="tabs" role="tablist">
+    <button class="tab" id="t1" role="tab" aria-selected="true">Operações</button>
+    <button class="tab" id="t2" role="tab" aria-selected="false">Gráfico mensal</button>
+  </div>
+  <section id="v1">
+
+  <form id="f">
+    <label>Data
+      <input type="date" id="data" required>
+    </label>
+    <label>Ativo
+      <input type="text" id="ativo" value="XAUUSD" required maxlength="20">
+    </label>
+    <label>Resultado em $ (use - para prejuízo)
+      <input type="number" id="valor" step="0.01" required placeholder="ex.: 150 ou -80">
+    </label>
+    <label>Pontos (use - para negativo)
+      <input type="number" id="pontos" step="0.01" required placeholder="ex.: 35 ou -20">
+    </label>
+    <label style="grid-column:1/-1">Descrição da operação (opcional)
+      <textarea id="desc" maxlength="600" placeholder="ex.: compra no suporte, stop curto, saí no alvo..."></textarea>
+    </label>
+    <label class="drop" id="drop">
+      <span id="hint">Toque ou arraste a imagem aqui<br><small>Será ajustada para 900×900 px</small></span>
+      <input type="file" id="file" accept="image/*">
+    </label>
+    <div class="actions">
+      <button type="submit" id="save">Salvar operação</button>
+      <button type="button" class="ghost" id="clear">Limpar</button>
+      <span id="msg" role="status"></span>
+    </div>
+  </form>
+
+  <div class="head"><h2>Operações salvas</h2><span class="count" id="count"></span></div>
+  <div class="actions" style="margin-bottom:14px">
+    <button type="button" class="ghost" id="exp">Exportar backup</button>
+    <button type="button" class="ghost" id="imp">Importar backup</button>
+    <input type="file" id="impf" accept="application/json,.json" hidden>
+  </div>
+  <div class="grid" id="list"></div>
+  </section>
+
+  <section id="v2" hidden>
+    <div class="actions" style="margin-bottom:6px">
+      <select id="mes" aria-label="Mês"></select>
+      <select id="met" aria-label="Métrica"><option value="valor">Resultado em $</option><option value="pontos">Pontos</option></select>
+      <select id="sem" aria-label="Semana"><option value="">Mês inteiro</option></select>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="chartbox" id="chart"></div>
+    <p class="sub" style="margin-top:10px;font-size:14px">Linha dourada: acumulado do mês. Barras: resultado de cada dia (verde positivo, vermelho negativo).</p>
+  </section>
+</main>
+
+<dialog id="dlg"><img id="big" alt="Operação ampliada"><p id="cap"></p></dialog>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var db, imgData=null, mem=[];
+  var f=$('f'),file=$('file'),drop=$('drop'),hint=$('hint'),msg=$('msg'),list=$('list');
+
+  function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+  function fmt(s){var p=s.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+  function say(t,err){msg.textContent=t;msg.className=err?'err':''}
+  function sg(n){return (n>0?'+':'')+n.toFixed(2).replace('.',',')}
+  var OFFMSG='Sexta e sábado são dias off. Escolha de domingo a quinta.';
+  function offDay(s){var q=s.split('-'),w=new Date(+q[0],+q[1]-1,+q[2]).getDay();return w===5||w===6}
+  $('data').value=today();
+
+  // IndexedDB
+  function open(cb){
+    try{
+      var r=indexedDB.open('diario-xauusd',1);
+      r.onupgradeneeded=function(){r.result.createObjectStore('ops',{keyPath:'id',autoIncrement:true})};
+      r.onsuccess=function(){db=r.result;try{navigator.storage.persist()}catch(e){}cb()};
+      r.onerror=function(){cb()};
+    }catch(e){cb()}
+  }
+  function all(cb){
+    if(!db){cb(mem);return}
+    try{
+      var q=db.transaction('ops').objectStore('ops').getAll();
+      q.onsuccess=function(){cb(q.result)};
+      q.onerror=function(){cb(mem)};
+    }catch(e){cb(mem)}
+  }
+  function add(o,cb){
+    if(!db){o.id=Date.now();mem.push(o);cb();return}
+    try{
+      var t=db.transaction('ops','readwrite');t.objectStore('ops').add(o);
+      t.oncomplete=cb;t.onerror=function(){say('Não foi possível salvar.',true)};
+    }catch(e){say('Não foi possível salvar.',true)}
+  }
+  function del(id,cb){
+    if(!db){mem=mem.filter(function(x){return x.id!==id});cb();return}
+    try{var t=db.transaction('ops','readwrite');t.objectStore('ops').delete(id);t.oncomplete=cb}catch(e){}
+  }
+
+  // Redimensiona para 900x900 (corte central)
+  function toSquare(img){
+    var c=document.createElement('canvas');c.width=c.height=900;
+    var s=Math.min(img.width,img.height),sx=(img.width-s)/2,sy=(img.height-s)/2;
+    c.getContext('2d').drawImage(img,sx,sy,s,s,0,0,900,900);
+    return c.toDataURL('image/jpeg',.88);
+  }
+  function load(fl){
+    if(!fl||!/^image\//.test(fl.type)){say('Escolha um arquivo de imagem.',true);return}
+    var u=URL.createObjectURL(fl),im=new Image();
+    im.onload=function(){
+      imgData=toSquare(im);URL.revokeObjectURL(u);
+      hint.innerHTML='<img src="'+imgData+'" alt="Pré-visualização 900×900">';
+      say(im.width===900&&im.height===900?'':'Imagem ajustada para 900×900 px.');
+    };
+    im.onerror=function(){say('Não consegui abrir essa imagem.',true)};
+    im.src=u;
+  }
+  file.onchange=function(){load(file.files[0])};
+  drop.ondragover=function(e){e.preventDefault()};
+  drop.ondrop=function(e){e.preventDefault();load(e.dataTransfer.files[0])};
+
+  function reset(){
+    imgData=null;file.value='';
+    hint.innerHTML='Toque ou arraste a imagem aqui<br><small>Será ajustada para 900×900 px</small>';
+  }
+  $('clear').onclick=function(){reset();say('')};
+
+  f.onsubmit=function(e){
+    e.preventDefault();
+    if(offDay($('data').value)){say(OFFMSG,true);return}
+    if(!imgData){say('Adicione a imagem da operação.',true);return}
+    add({data:$('data').value,ativo:$('ativo').value.trim().toUpperCase(),valor:parseFloat($('valor').value),pontos:parseFloat($('pontos').value),desc:$('desc').value.trim(),img:imgData,criado:Date.now()},function(){
+      reset();$('valor').value='';$('pontos').value='';$('desc').value='';say('Operação salva.');render();
+    });
+  };
+
+  function render(){
+    all(function(rows){
+      rows=rows.slice().sort(function(a,b){return a.data<b.data?1:a.data>b.data?-1:b.criado-a.criado});
+      var tv=0,tp=0;rows.forEach(function(r){tv+=r.valor||0;tp+=r.pontos||0});
+      $('count').textContent=rows.length+(rows.length===1?' operação':' operações')+(rows.length?' · Total: '+sg(tv)+' $ · '+sg(tp)+' pts':'');
+      list.innerHTML='';
+      if(!rows.length){list.innerHTML='<div class="empty" style="grid-column:1/-1">Nenhuma operação ainda. Preencha o formulário acima para registrar a primeira.</div>';return}
+      rows.forEach(function(r){
+        var d=document.createElement('div');d.className='card';
+        var im=document.createElement('img');im.src=r.img;im.alt='Operação '+r.ativo+' em '+fmt(r.data);
+        im.onclick=function(){$('big').src=r.img;$('cap').textContent=r.ativo+' · '+fmt(r.data)+' · '+sg(r.valor||0)+' $ · '+sg(r.pontos||0)+' pts'+(r.desc?String.fromCharCode(10)+r.desc:'');$('dlg').showModal()};
+        var m=document.createElement('div');m.className='meta';
+        var t=document.createElement('div');
+        t.innerHTML='<b></b><span></span><div class="res"></div><div class="desc"></div>';t.firstChild.textContent=r.ativo;t.children[1].textContent=fmt(r.data);
+        var v=r.valor||0,rs=t.children[2];t.lastChild.textContent=r.desc||'';rs.className='res '+(v<0?'neg':'pos');rs.textContent=sg(v)+' $ · '+sg(r.pontos||0)+' pts';
+        var b=document.createElement('button');b.className='del';b.textContent='Excluir';
+        b.onclick=function(){if(confirm('Excluir esta operação?'))del(r.id,render)};
+        m.appendChild(t);m.appendChild(b);d.appendChild(im);d.appendChild(m);list.appendChild(d);
+      });
+    });
+  }
+  $('exp').onclick=function(){
+    all(function(rows){
+      var b=new Blob([JSON.stringify(rows)],{type:'application/json'});
+      var a=document.createElement('a');a.href=URL.createObjectURL(b);
+      a.download='diario-xauusd-'+today()+'.json';
+      document.body.appendChild(a);a.click();a.remove();
+    });
+  };
+  $('imp').onclick=function(){$('impf').click()};
+  $('impf').onchange=function(){
+    var inp=this,fl=inp.files[0];if(!fl)return;
+    var rd=new FileReader();
+    rd.onload=function(){
+      try{
+        var arr=JSON.parse(rd.result);
+        if(!Array.isArray(arr))throw 0;
+        all(function(cur){
+          var have={};cur.forEach(function(c){have[c.criado]=1});
+          var todo=arr.filter(function(o){return o&&o.img&&o.data&&!have[o.criado]});
+          if(!todo.length){say('Nada novo para importar.');return}
+          var left=todo.length;
+          todo.forEach(function(o){delete o.id;add(o,function(){if(--left===0){say(todo.length+' operações importadas.');render()}})});
+        });
+      }catch(e){say('Arquivo de backup inválido.',true)}
+    };
+    rd.readAsText(fl);inp.value='';
+  };
+  var MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  function nf(v){return (Math.abs(v)>=100?v.toFixed(0):v.toFixed(2)).replace('.',',')}
+  var DIAS=['Dom','Seg','Ter','Qua','Qui'];
+  function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+  function addd(s,n){var q=s.split('-');return iso(new Date(+q[0],+q[1]-1,+q[2]+n))}
+  function wstart(s){var q=s.split('-'),d=new Date(+q[0],+q[1]-1,+q[2]);return addd(s,-d.getDay())}
+  function dm(s){return s.slice(8,10)+'/'+s.slice(5,7)}
+  function chart(){
+    all(function(rows){
+      var sel=$('mes'),cur=sel.value,ms={},box=$('chart'),st=$('stats');
+      rows.forEach(function(r){ms[r.data.slice(0,7)]=1});
+      var keys=Object.keys(ms).sort().reverse();
+      if(!keys.length){sel.innerHTML='';st.innerHTML='';box.innerHTML='<div class="empty">Salve operações para ver o gráfico.</div>';return}
+      if(keys.indexOf(cur)<0)cur=keys[0];
+      sel.innerHTML=keys.map(function(k){var q=k.split('-');return '<option value="'+k+'"'+(k===cur?' selected':'')+'>'+MESES[+q[1]-1]+' de '+q[0]+'</option>'}).join('');
+      var met=$('met').value,un=met==='valor'?'$':'pts',by={},cnt=0;
+      var p=cur.split('-'),dim=new Date(+p[0],+p[1],0).getDate(),wk={};
+      rows.forEach(function(r){if(r.data.slice(0,7)===cur)wk[wstart(r.data)]=1});
+      var wkeys=Object.keys(wk).sort(),ws=$('sem'),wcur=ws.value;
+      if(wkeys.indexOf(wcur)<0)wcur='';
+      ws.innerHTML='<option value="">Mês inteiro</option>'+wkeys.map(function(k){return '<option value="'+k+'"'+(k===wcur?' selected':'')+'>Semana de '+dm(k)+' a '+dm(addd(k,4))+'</option>'}).join('');
+      var slots=[],inSlot={};
+      if(wcur){for(var i=0;i<5;i++){var k=addd(wcur,i);slots.push({k:k,l:DIAS[i]+' '+k.slice(8,10)})}}
+      else{for(var d=1;d<=dim;d++)slots.push({k:cur+'-'+String(d).padStart(2,'0'),l:String(d)})}
+      slots.forEach(function(s,i){inSlot[s.k]=i});
+      rows.forEach(function(r){if(!(r.data in inSlot))return;by[r.data]=(by[r.data]||0)+(r[met]||0);cnt++});
+      var days=Object.keys(by).sort();
+      if(!days.length){st.innerHTML='';box.innerHTML='<div class="empty">Sem operações de domingo a quinta neste período.</div>';return}
+      
+      var vals=days.map(function(d){return by[d]}),run=0,cum=vals.map(function(v){run+=v;return run});
+      var tot=run,bi=0,wi=0,np=0,nn=0;
+      vals.forEach(function(v,i){if(v>vals[bi])bi=i;if(v<vals[wi])wi=i;if(v>0)np++;if(v<0)nn++});
+      function stat(l,v,c){return '<div class="stat"><span>'+l+'</span><b class="'+(c||'')+'">'+v+'</b></div>'}
+      st.innerHTML=stat('Total do mês',sg(tot)+' '+un,tot<0?'neg':'pos')+stat('Melhor dia',sg(vals[bi])+' '+un+' ('+dm(days[bi])+')','pos')+stat('Pior dia',sg(vals[wi])+' '+un+' ('+dm(days[wi])+')','neg')+stat('Dias +  /  −',np+'  /  '+nn)+stat('Operações',String(cnt));
+      var W=760,H=320,L=52,R=16,T=26,B=34,pw=W-L-R,ph=H-T-B;
+      var all2=[0].concat(vals,cum),rmx=Math.max.apply(null,all2),rmn=Math.min.apply(null,all2);
+      var mx=rmx,mn=rmn;if(mx===mn)mx=mn+1;var pad=(mx-mn)*.14;mx+=pad;mn-=pad;
+      function X(k){return L+(inSlot[k]+.5)/slots.length*pw}
+      function Y(v){return T+(mx-v)/(mx-mn)*ph}
+      var s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;min-width:620px;height:auto;display:block" role="img" aria-label="Gráfico do mês">';
+      var ticks=[rmx,0,rmn].filter(function(v,i,a){return a.indexOf(v)===i});
+      ticks.forEach(function(v){s+='<line class="'+(v===0?'zl':'gl')+'" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'"/><text class="tx" x="'+(L-6)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+nf(v)+'</text>'});
+      slots.forEach(function(sl){s+='<text class="tx" x="'+X(sl.k)+'" y="'+(H-12)+'" text-anchor="middle">'+sl.l+'</text>'});
+      var bw=Math.min(slots.length<=7?40:18,pw/slots.length*.55),y0=Y(0);
+      days.forEach(function(d,i){
+        var v=vals[i],y=Y(v);
+        s+='<rect class="'+(v>=0?'bp':'bn')+'" x="'+(X(d)-bw/2)+'" y="'+Math.min(y,y0)+'" width="'+bw+'" height="'+Math.max(1,Math.abs(y-y0))+'"><title>'+dm(d)+': '+sg(v)+' '+un+'</title></rect>';
+        s+='<text class="tx" x="'+X(d)+'" y="'+(v>=0?y-5:y+13)+'" text-anchor="middle">'+sg(v).replace(',00','')+'</text>';
+      });
+      s+='<polyline class="ln" points="'+days.map(function(d,i){return X(d)+','+Y(cum[i])}).join(' ')+'"/>';
+      days.forEach(function(d,i){s+='<circle class="'+(vals[i]>=0?'dp':'dn')+'" cx="'+X(d)+'" cy="'+Y(cum[i])+'" r="4.5"><title>'+dm(d)+' · acumulado: '+sg(cum[i])+' '+un+'</title></circle>'});
+      box.innerHTML=s+'</svg>';
+    });
+  }
+  function tab(n){
+    $('v1').hidden=n!==1;$('v2').hidden=n!==2;
+    $('t1').setAttribute('aria-selected',n===1);$('t2').setAttribute('aria-selected',n===2);
+    if(n===2)chart();
+  }
+  $('t1').onclick=function(){tab(1)};$('t2').onclick=function(){tab(2)};
+  $('mes').onchange=function(){$('sem').value='';chart()};$('met').onchange=chart;$('sem').onchange=chart;
+  $('data').onchange=function(){var o=offDay(this.value);say(o?OFFMSG:'',o)};
+  if(offDay($('data').value))say('Hoje é dia off (sexta ou sábado). Escolha uma data de domingo a quinta.',true);
+  $('dlg').onclick=function(){this.close()};
+  open(render);
+})();
+</script>
+</body>
+</html>
