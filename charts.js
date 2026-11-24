@@ -1,19 +1,19 @@
-/* Bloco "Curva de capital" (topo) com filtros Mês / Métrica / Semana, ampliação ao clicar.
+/* Bloco "Curva de capital" (topo) com filtros Mês / Semana, ampliação ao clicar.
    Uso: TopCharts.render(rows) — rows = operações {data, valor, pontos, criado}. Precisa de <div id="tcchart">. */
 (function(){
 var G='stroke="#8884" stroke-width="1"',MES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'],
-    F={m:'',t:'valor',w:''},rows0=[],M=null,dlg=null;
+    F={m:'',w:''},rows0=[],M=null,dlg=null;
 function nf(v){return(Math.abs(v)>=100?v.toFixed(0):v.toFixed(2)).replace('.',',')}
 function sg(v){return(v>0?'+':'')+v.toFixed(2).replace('.',',')}
 function dmy(k){return k.slice(8)+'/'+k.slice(5,7)}
 function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function addd(s,n){var q=s.split('-');return iso(new Date(+q[0],+q[1]-1,+q[2]+n))}
 function wstart(s){var q=s.split('-');return addd(s,-new Date(+q[0],+q[1]-1,+q[2]).getDay())}
-function un(){return F.t==='valor'?'$':'pts'}
+function un(){return'$'}
 function model(){
   var r=rows0.filter(function(x){return(!F.m||x.data.slice(0,7)===F.m)&&(!F.w||wstart(x.data)===F.w)}).sort(function(a,b){return a.data<b.data?-1:a.data>b.data?1:(a.criado||0)-(b.criado||0)}),
       by={},w=0,l=0,gs=0,ls=0,bw=0,bl=0;
-  r.forEach(function(x){var v=x[F.t]||0;by[x.data]=(by[x.data]||0)+v;if((x.valor||0)>0){w++;gs+=v;bw=Math.max(bw,v)}else{l++;ls-=v;bl=Math.min(bl,v)}});
+  r.forEach(function(x){var v=x.valor||0;by[x.data]=(by[x.data]||0)+v;if((x.valor||0)>0){w++;gs+=v;bw=Math.max(bw,v)}else{l++;ls-=v;bl=Math.min(bl,v)}});
   var ks=Object.keys(by).sort(),c=0,pk=0,dd=0,eq=[{l:'Início',v:0}];
   ks.forEach(function(k){c+=by[k];eq.push({l:dmy(k),v:c});pk=Math.max(pk,c);dd=Math.max(dd,pk-c)});
   return{n:r.length,w:w,l:l,gs:gs,ls:ls,bw:bw,bl:bl,ks:ks,eq:eq,tot:c,pk:pk,dd:dd};
@@ -33,7 +33,6 @@ function filters(){
   var ms={},wk={};rows0.forEach(function(r){ms[r.data.slice(0,7)]=1;if(F.m&&r.data.slice(0,7)===F.m)wk[wstart(r.data)]=1});
   var mk=Object.keys(ms).sort().reverse(),wkeys=Object.keys(wk).sort();if(mk.indexOf(F.m)<0)F.m='';if(wkeys.indexOf(F.w)<0)F.w='';
   return'<div class="tcf"><select id="tcm" aria-label="Mês">'+opt('','Todo o período',!F.m)+mk.map(function(k){var q=k.split('-');return opt(k,MES[+q[1]-1]+' de '+q[0],k===F.m)}).join('')+'</select>'+
-   '<select id="tct" aria-label="Métrica">'+opt('valor','Resultado em $',F.t==='valor')+opt('pontos','Pontos',F.t==='pontos')+'</select>'+
    '<select id="tcw" aria-label="Semana"'+(F.m?'':' disabled')+'>'+opt('','Mês inteiro',!F.w)+wkeys.map(function(k){return opt(k,'Semana de '+dmy(k)+' a '+dmy(addd(k,4)),k===F.w)}).join('')+'</select></div>';
 }
 function draw(){
@@ -48,12 +47,12 @@ function open(){
   if(!dlg){dlg=document.createElement('dialog');dlg.className='tcm';
     dlg.innerHTML='<div class="tcmi"><div class="tcmh"><div class="tt" id="tcmt"></div><button type="button" class="ghost" id="tcmx" aria-label="Fechar">✕</button></div><div id="tcmb"></div><div class="tcs" id="tcms"></div></div>';
     document.body.appendChild(dlg);dlg.onclick=function(e){if(e.target===dlg)dlg.close()};dlg.querySelector('#tcmx').onclick=function(){dlg.close()}}
-  dlg.querySelector('#tcmt').textContent='Curva de capital · '+(F.m?MES[+F.m.slice(5)-1]+' de '+F.m.slice(0,4):'todo o período')+(F.w?' · semana de '+dmy(F.w):'')+' · '+un();
+  dlg.querySelector('#tcmt').textContent='Curva de capital · '+(F.m?MES[+F.m.slice(5)-1]+' de '+F.m.slice(0,4):'todo o período')+(F.w?' · semana de '+dmy(F.w):'');
   dlg.querySelector('#tcmb').innerHTML=line(M.eq,900,400,1);dlg.querySelector('#tcms').innerHTML=s;if(!dlg.open)dlg.showModal();
 }
 document.addEventListener('click',function(e){var c=e.target.closest&&e.target.closest('.tc');if(c&&!e.target.closest('.tcf'))open()});
 document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('tc')){e.preventDefault();open()}});
-document.addEventListener('change',function(e){var i=e.target.id;if(i==='tcm'){F.m=e.target.value;F.w=''}else if(i==='tct')F.t=e.target.value;else if(i==='tcw')F.w=e.target.value;else return;draw()});
+document.addEventListener('change',function(e){var i=e.target.id;if(i==='tcm'){F.m=e.target.value;F.w=''}else if(i==='tcw')F.w=e.target.value;else return;draw()});
 // ---- calendários: ampliar (move o próprio bloco para uma janela e devolve ao fechar)
 var cdlg=null,home=null,cur=null;
 function openCal(a){
