@@ -21,7 +21,7 @@ function model(){
 function line(p,W,H,big){
   var L=big?58:46,a=p.map(function(x){return x.v}),mn=Math.min.apply(0,a),mx=Math.max.apply(0,a),pd=(mx-mn)*.1||1,n=p.length,t=big?6:4,s='',i,v;mn-=pd;mx+=pd;
   function X(i){return L+i/(n-1)*(W-L-14)}function Y(v){return 10+(1-(v-mn)/(mx-mn))*(H-36)}
-  for(i=0;i<t;i++){v=mn+(mx-mn)*i/(t-1);s+='<line x1="'+L+'" x2="'+W+'" y1="'+Y(v)+'" y2="'+Y(v)+'" '+G+'/><text x="2" y="'+(Y(v)+4)+'">'+v.toFixed(0)+'</text>'}
+  for(i=0;i<t;i++){v=mn+(mx-mn)*i/(t-1);s+='<line x1="'+L+'" x2="'+W+'" y1="'+Y(v)+'" y2="'+Y(v)+'" '+G+'/><text class="pv" x="2" y="'+(Y(v)+4)+'">'+v.toFixed(0)+'</text>'}
   s+='<polyline fill="none" stroke="#f0b93a" stroke-width="'+(big?3:2.5)+'" points="'+p.map(function(x,i){return X(i)+','+Y(x.v)}).join(' ')+'"/>';
   p.forEach(function(x,i){s+='<circle cx="'+X(i)+'" cy="'+Y(x.v)+'" r="'+(big?5:4)+'" fill="#f0b93a"><title>'+x.l+': '+sg(x.v)+' '+un()+'</title></circle>'});
   var st=big?Math.ceil(n/10):n;
@@ -39,7 +39,7 @@ function draw(){
   var el=document.getElementById('tcchart');if(!el)return;M=model();
   el.innerHTML='<div class="tc" data-k="eq" tabindex="0" role="button" aria-label="Ampliar: Curva de capital"><div class="tt">Curva de capital</div>'+filters()+(M.ks.length?line(M.eq,600,240):'<div class="em">Sem dados neste filtro.</div>')+'</div>';
 }
-function stat(t,v,c){return'<div class="tcb"><small>'+t+'</small><b class="'+(c||'')+'">'+v+'</b></div>'}
+function stat(t,v,c){return'<div class="tcb'+(String(v).indexOf('$')>-1?' m':'')+'"><small>'+t+'</small><b class="'+(c||'')+'">'+v+'</b></div>'}
 function open(){
   if(!M||!M.ks.length)return;var u=' '+un(),pc=Math.round(M.w/M.n*100);
   var s=stat('Resultado acumulado',sg(M.tot)+u,M.tot>=0?'pos':'neg')+stat('Pico acumulado',sg(M.pk)+u)+stat('Drawdown máximo','-'+nf(M.dd)+u,'neg')+stat('Dias operados',M.ks.length)+stat('Operações',M.n)+
