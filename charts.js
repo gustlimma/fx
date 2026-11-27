@@ -80,5 +80,7 @@ function streak(rows){
   el.innerHTML='<div class="stt">Histórico de sequência</div><div class="sk"><div><b>'+run+'</b><small>dias seguidos agora</small></div><div><b>'+best+'</b><small>recorde de dias</small></div><div><b>'+ws+'</b><small>semanas verdes seguidas</small></div></div><div class="sws">'+
     wk.map(function(x){return'<div class="sw sw-'+x.st+'" title="Semana de '+dmy(x.w)+(x.st==='bad'?': teve dia sem seguir as regras':x.st==='ok'?': todas as regras seguidas':': sem registro')+'"><small>'+dmy(x.w)+'</small><div class="sd">'+x.days.map(function(on){return'<i'+(x.st==='ok'&&on?' class="on"':'')+'></i>'}).join('')+'</div></div>'}).join('')+'</div><p class="mu2">Semana verde = nenhum dia quebrou as regras. Se algum dia não foi seguido, a semana inteira fica sem pintar.</p>';
 }
-window.TopCharts={render:function(rows){rows0=rows;draw();streak(rows)}};
+function runNow(rows){var by={},run=0;rows.forEach(function(r){var d=by[r.data]||(by[r.data]={ok:0,bad:0});if(r.regra==='risco')d.bad++;else if(r.regra==='ok')d.ok++});
+  Object.keys(by).filter(function(k){return by[k].ok||by[k].bad}).sort().forEach(function(k){run=by[k].bad?0:run+1});return run}
+window.TopCharts={render:function(rows){rows0=rows;draw();streak(rows)},run:runNow};
 })();

@@ -148,7 +148,10 @@ form{padding:16px}
 .cd.hj{box-shadow:0 0 0 2px var(--gold)}
 .clg{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:12px;font-size:12px;color:var(--muted)}
 .k{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
-.k.ok{background:var(--ok)}.k.lo{background:var(--danger)}.k.sr{background:var(--gold)}.k.of{background:var(--muted);opacity:.5}
+.k.ok{background:var(--ok)}.k.lo{background:var(--danger)}.k.sr{background:var(--gold)}.k.of{background:var(--muted);opacity:.5}.k.yl{background:var(--gold)}
+.kleg .clg{margin-top:8px;font-size:13px;gap:8px 14px}
+@media (min-width:900px){.kpis{grid-template-columns:1fr 1fr 1fr 1.8fr}}
+#rgrid .cd.of{color:var(--gold);background:color-mix(in srgb,var(--gold) 10%,transparent);border-color:color-mix(in srgb,var(--gold) 45%,transparent)}
 .csum{margin:10px 0 0;font-size:13px;color:var(--muted)}
 .cd.rk{background:color-mix(in srgb,var(--ok) 20%,transparent);border-color:var(--ok);color:var(--ok)}
 .cd.rb{background:color-mix(in srgb,var(--danger) 20%,transparent);border-color:var(--danger);color:var(--danger)}
@@ -193,7 +196,6 @@ dialog img{width:100%;height:auto;display:block;border-radius:4px}
     <div class="calh"><button type="button" class="ghost" id="rprev" aria-label="Mês anterior">‹</button><b id="rtit"></b><button type="button" class="ghost" id="rnext" aria-label="Próximo mês">›</button></div>
     <p class="calt">Seguiu o padrão da estratégia?</p>
     <div class="cgrid" id="rgrid"></div>
-    <div class="clg"><span><i class="k ok"></i>Segui as regras</span><span><i class="k lo"></i>Não segui</span><span><i class="k of"></i>Off</span></div>
     <p class="csum" id="rsum"></p>
     <div class="streak" id="rstreak"></div>
   </aside>
@@ -467,8 +469,8 @@ dialog img{width:100%;height:auto;display:block;border-radius:4px}
   if(offDay($('data').value))say('Hoje é dia off (sexta ou sábado). Escolha uma data de domingo a quinta.',true);
   function kpis(rows,tv,tp){
     var w=rows.filter(function(r){return (r.valor||0)>0}).length,rate=rows.length?Math.round(w/rows.length*100):0;
-    var it=[['Taxa de acerto',rate,'%',0,0],['Operações',rows.length,'',0,0]];
-    $('kpis').innerHTML=it.map(function(x){return '<div class="kpi"><span>'+x[0]+'</span><b class="'+(x[4]?(x[1]<0?'neg':'pos'):'')+'" data-v="'+x[1]+'" data-d="'+x[3]+'" data-s="'+x[4]+'">0</b><i>'+x[2]+'</i></div>'}).join('');
+    var it=[['Taxa de acerto',rate,'%',0,0],['Operações',rows.length,'',0,0],['Dias seguidos agora',window.TopCharts?TopCharts.run(rows):0,'',0,0,'pos']];
+    $('kpis').innerHTML=it.map(function(x){return '<div class="kpi"><span>'+x[0]+'</span><b class="'+(x[4]?(x[1]<0?'neg':'pos'):(x[5]||''))+'" data-v="'+x[1]+'" data-d="'+x[3]+'" data-s="'+x[4]+'">0</b><i>'+x[2]+'</i></div>'}).join('')+'<div class="kpi kleg"><span>Legenda</span><div class="clg"><span><i class="k ok"></i>Segui as regras</span><span><i class="k lo"></i>Não segui</span><span><i class="k yl"></i>Dia off</span></div></div>';
     var els=$('kpis').querySelectorAll('b'),t0=performance.now();
     function step(t){
       var k=Math.max(0,Math.min(1,(t-t0)/900)),e=1-Math.pow(1-k,3);
